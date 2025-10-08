@@ -45,23 +45,25 @@ export default function DriveTimeDisplay({ latitude, longitude }: DriveTimeDispl
 
   if (isLoading) {
     return (
-      <div className="flex items-center gap-3">
-        <span className="text-3xl">🚗</span>
-        <span className="text-lg font-semibold text-gray-600 animate-pulse">Calculating route...</span>
+      <div className="flex items-center gap-4">
+        <span className="text-5xl">🚗</span>
+        <span className="text-2xl font-black text-blue-300 animate-pulse uppercase tracking-wider">Calculating Route...</span>
       </div>
     );
   }
 
   return (
-    <div className="flex items-center gap-3">
-      <span className="text-3xl">🚗</span>
+    <div className="flex items-center gap-5">
+      <span className="text-6xl">🚗</span>
       <div>
-        <div className="text-2xl font-black text-gray-900">
+        <div className="text-5xl font-black text-white">
           {driveTime}
-          {distance && (
-            <span className="text-lg text-gray-600 font-semibold ml-2">({distance})</span>
-          )}
         </div>
+        {distance && (
+          <div className="text-2xl font-bold text-blue-300 mt-1">
+            {distance}
+          </div>
+        )}
       </div>
     </div>
   );
