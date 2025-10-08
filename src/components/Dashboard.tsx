@@ -161,51 +161,51 @@ export default function Dashboard() {
                   key={request.id}
                   className={`${priority.bg} rounded-2xl shadow-xl ${priority.pulse ? 'animate-pulse' : ''}`}
                 >
-                  <div className="p-8">
-                    <div className="grid grid-cols-12 gap-8">
+                  <div className="p-10">
+                    <div className="grid grid-cols-12 gap-10">
                       {/* Position Badge */}
-                      <div className="col-span-1 flex items-center justify-center">
-                        <div className="w-24 h-24 bg-black/30 rounded-2xl flex items-center justify-center">
-                          <span className="text-6xl font-black text-white">{index + 1}</span>
+                      <div className="col-span-1 flex items-start justify-center pt-2">
+                        <div className="w-28 h-28 bg-black/30 rounded-2xl flex items-center justify-center">
+                          <span className="text-7xl font-black text-white">{index + 1}</span>
                         </div>
                       </div>
 
                       {/* Main Info */}
-                      <div className="col-span-5 space-y-4">
-                        <div className={`inline-block ${priority.badgeBg} px-5 py-2 rounded-lg`}>
-                          <span className="text-xl font-black text-white uppercase tracking-wider">{priority.label}</span>
+                      <div className="col-span-5 space-y-7">
+                        <div className={`inline-block ${priority.badgeBg} px-6 py-2.5 rounded-lg shadow-lg`}>
+                          <span className="text-lg font-black text-white uppercase tracking-widest">{priority.label}</span>
                         </div>
 
                         <div>
-                          <div className="text-sm font-bold text-white/80 uppercase tracking-wider mb-2">Technician</div>
-                          <div className="text-4xl font-black text-white">{request.tech_name}</div>
+                          <div className="text-xs font-bold text-white/70 uppercase tracking-widest mb-3">Technician</div>
+                          <div className="text-5xl font-black text-white leading-tight">{request.tech_name}</div>
                         </div>
 
                         <div>
-                          <div className="text-sm font-bold text-white/80 uppercase tracking-wider mb-2">Job Site</div>
-                          <div className="text-2xl font-bold text-white/95">{request.job_name}</div>
+                          <div className="text-xs font-bold text-white/70 uppercase tracking-widest mb-3">Job Site</div>
+                          <div className="text-3xl font-bold text-white/95 leading-snug">{request.job_name}</div>
                         </div>
 
                         {request.notes && (
-                          <div className="bg-black/20 rounded-xl p-4 mt-4">
-                            <div className="text-sm font-bold text-white/80 uppercase tracking-wider mb-2">Notes</div>
-                            <div className="text-lg font-semibold text-white/95">{request.notes}</div>
+                          <div className="bg-black/20 rounded-xl p-6 mt-6">
+                            <div className="text-xs font-bold text-white/70 uppercase tracking-widest mb-3">Notes</div>
+                            <div className="text-lg font-medium text-white/95 leading-relaxed">{request.notes}</div>
                           </div>
                         )}
                       </div>
 
                       {/* Address & Drive Time */}
-                      <div className="col-span-4 space-y-4">
+                      <div className="col-span-4 space-y-6">
                         {request.delivery_address && (
-                          <div className="bg-black/20 rounded-xl p-5">
-                            <div className="text-sm font-bold text-white/80 uppercase tracking-wider mb-3">Delivery Address</div>
-                            <div className="text-xl font-bold text-white leading-relaxed">{request.delivery_address}</div>
+                          <div className="bg-black/20 rounded-xl p-6">
+                            <div className="text-xs font-bold text-white/70 uppercase tracking-widest mb-4">Delivery Address</div>
+                            <div className="text-lg font-semibold text-white leading-relaxed">{request.delivery_address}</div>
                           </div>
                         )}
 
                         {request.delivery_latitude && request.delivery_longitude && (
-                          <div className="bg-black/20 rounded-xl p-5">
-                            <div className="text-sm font-bold text-white/80 uppercase tracking-wider mb-3">Drive Time</div>
+                          <div className="bg-black/20 rounded-xl p-6">
+                            <div className="text-xs font-bold text-white/70 uppercase tracking-widest mb-4">Drive Time</div>
                             <DriveTimeDisplay
                               latitude={request.delivery_latitude}
                               longitude={request.delivery_longitude}
@@ -215,27 +215,27 @@ export default function Dashboard() {
                       </div>
 
                       {/* Metadata */}
-                      <div className="col-span-2 space-y-4">
-                        <div className="bg-black/20 rounded-xl p-4 text-center">
-                          <div className="text-xs font-bold text-white/80 uppercase tracking-wider mb-2">Age</div>
-                          <div className="text-3xl font-black text-white tabular-nums">{timeAgo}</div>
+                      <div className="col-span-2 space-y-5">
+                        <div className="bg-black/20 rounded-xl p-5 text-center">
+                          <div className="text-xs font-bold text-white/70 uppercase tracking-widest mb-3">Age</div>
+                          <div className="text-4xl font-black text-white tabular-nums">{timeAgo}</div>
                         </div>
 
                         {request.truck_number && (
-                          <div className="bg-black/20 rounded-xl p-4 text-center">
-                            <div className="text-xs font-bold text-white/80 uppercase tracking-wider mb-2">Truck</div>
+                          <div className="bg-black/20 rounded-xl p-5 text-center">
+                            <div className="text-xs font-bold text-white/70 uppercase tracking-widest mb-3">Truck</div>
                             <div className="text-3xl font-black text-white">{request.truck_number}</div>
                           </div>
                         )}
 
-                        <div className="bg-black/20 rounded-xl p-4 text-center">
-                          <div className="text-xs font-bold text-white/80 uppercase tracking-wider mb-2">Items</div>
+                        <div className="bg-black/20 rounded-xl p-5 text-center">
+                          <div className="text-xs font-bold text-white/70 uppercase tracking-widest mb-3">Items</div>
                           <div className="text-3xl font-black text-white">{request.items?.length || 0}</div>
                         </div>
 
-                        <div className="bg-black/20 rounded-xl p-4">
-                          <div className="text-xs font-bold text-white/80 uppercase tracking-wider mb-2">ID</div>
-                          <div className="font-mono text-xs text-white/90 break-all">{request.request_id}</div>
+                        <div className="bg-black/20 rounded-xl p-5">
+                          <div className="text-xs font-bold text-white/70 uppercase tracking-widest mb-3">Request ID</div>
+                          <div className="font-mono text-xs text-white/80 break-all leading-relaxed">{request.request_id}</div>
                         </div>
                       </div>
                     </div>
