@@ -212,7 +212,7 @@ export default function Dashboard() {
           </div>
         ) : requests && requests.length > 0 ? (
           <div id="scroll-container" className="h-full overflow-y-auto py-10" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-            <div className="space-y-10 pb-10">
+            <div className="pb-10">
             {requests.map((request, index) => {
               const priority = getPriorityConfig(request.priority);
               const timeAgo = getTimeAgo(request.created_at);
@@ -220,7 +220,7 @@ export default function Dashboard() {
               return (
                 <div
                   key={request.id}
-                  className={`${priority.bg} rounded-2xl shadow-2xl hover:shadow-3xl transition-shadow ${priority.pulse ? 'animate-pulse' : ''}`}
+                  className={`${priority.bg} rounded-2xl shadow-2xl hover:shadow-3xl transition-shadow ${priority.pulse ? 'animate-pulse' : ''} ${index > 0 ? 'mt-10' : ''}`}
                   style={{
                     boxShadow: '0 20px 40px rgba(0, 0, 0, 0.4), 0 10px 20px rgba(0, 0, 0, 0.3), inset 0 -2px 4px rgba(0, 0, 0, 0.2)'
                   }}
