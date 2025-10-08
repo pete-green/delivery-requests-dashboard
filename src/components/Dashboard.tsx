@@ -204,14 +204,14 @@ export default function Dashboard() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-[1900px] mx-auto px-10 py-8 overflow-hidden" style={{ height: 'calc(100vh - 180px)' }}>
+      <div className="max-w-[1900px] mx-auto px-10 overflow-hidden" style={{ height: 'calc(100vh - 160px)' }}>
         {isLoading ? (
           <div className="flex flex-col items-center justify-center h-full">
             <div className="w-20 h-20 border-8 border-slate-700 border-t-emerald-500 rounded-full animate-spin mb-8"></div>
             <p className="text-3xl text-slate-400 font-bold">Loading requests...</p>
           </div>
         ) : requests && requests.length > 0 ? (
-          <div id="scroll-container" className="h-full overflow-hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+          <div id="scroll-container" className="h-full overflow-y-auto py-8" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
             <div className="space-y-8">
             {requests.map((request, index) => {
               const priority = getPriorityConfig(request.priority);
