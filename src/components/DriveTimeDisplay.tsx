@@ -7,7 +7,7 @@ interface DriveTimeDisplayProps {
 }
 
 export default function DriveTimeDisplay({ latitude, longitude }: DriveTimeDisplayProps) {
-  const [driveTime, setDriveTime] = useState<string>('Calculating...');
+  const [driveTime, setDriveTime] = useState<string>('...');
   const [distance, setDistance] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
 
@@ -29,7 +29,7 @@ export default function DriveTimeDisplay({ latitude, longitude }: DriveTimeDispl
       } catch (error) {
         console.error('Error fetching drive data:', error);
         if (!cancelled) {
-          setDriveTime('Unable to calculate');
+          setDriveTime('N/A');
           setDistance('');
           setIsLoading(false);
         }
@@ -45,26 +45,23 @@ export default function DriveTimeDisplay({ latitude, longitude }: DriveTimeDispl
 
   if (isLoading) {
     return (
-      <div className="flex items-center gap-4">
-        <span className="text-5xl">🚗</span>
-        <span className="text-2xl font-black text-blue-300 animate-pulse uppercase tracking-wider">Calculating Route...</span>
+      <div className="text-center">
+        <div className="text-6xl font-black text-white animate-pulse mb-2">...</div>
+        <div className="text-xl font-bold text-blue-300 uppercase tracking-wider">CALCULATING</div>
       </div>
     );
   }
 
   return (
-    <div className="flex items-center gap-5">
-      <span className="text-6xl">🚗</span>
-      <div>
-        <div className="text-5xl font-black text-white">
-          {driveTime}
-        </div>
-        {distance && (
-          <div className="text-2xl font-bold text-blue-300 mt-1">
-            {distance}
-          </div>
-        )}
+    <div className="text-center">
+      <div className="text-7xl font-black text-white tabular-nums mb-2">
+        {driveTime}
       </div>
+      {distance && (
+        <div className="text-3xl font-bold text-blue-300">
+          {distance}
+        </div>
+      )}
     </div>
   );
 }
