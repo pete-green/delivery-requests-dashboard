@@ -5,6 +5,7 @@ import DriveTimeDisplay from './DriveTimeDisplay';
 export default function Dashboard() {
   const { data: requests, isLoading, error, refetch } = useDeliveryRequests();
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [scrollPosition, setScrollPosition] = useState(0);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -13,6 +14,65 @@ export default function Dashboard() {
 
     return () => clearInterval(timer);
   }, []);
+
+  // Auto-scroll effect
+  useEffect(() => {
+    if (!requests || requests.length <= 3) return;
+
+    const scrollContainer = document.getElementById('scroll-container');
+    if (!scrollContainer) return;
+
+    const maxScroll = scrollContainer.scrollHeight - scrollContainer.clientHeight;
+    const scrollSpeed = 0.5; // pixels per frame
+    const pauseAtTop = 3000; // ms to pause at top
+    const pauseAtBottom = 2000; // ms to pause at bottom
+
+    let isScrollingDown = true;
+    let isPaused = false;
+
+    const scroll = () => {
+      if (isPaused) return;
+
+      if (isScrollingDown) {
+        setScrollPosition((prev) => {
+          const next = prev + scrollSpeed;
+          if (next >= maxScroll) {
+            isPaused = true;
+            setTimeout(() => {
+              isPaused = false;
+              isScrollingDown = false;
+            }, pauseAtBottom);
+            return maxScroll;
+          }
+          return next;
+        });
+      } else {
+        setScrollPosition((prev) => {
+          const next = prev - scrollSpeed;
+          if (next <= 0) {
+            isPaused = true;
+            setTimeout(() => {
+              isPaused = false;
+              isScrollingDown = true;
+            }, pauseAtTop);
+            return 0;
+          }
+          return next;
+        });
+      }
+    };
+
+    const interval = setInterval(scroll, 16); // ~60fps
+
+    return () => clearInterval(interval);
+  }, [requests]);
+
+  useEffect(() => {
+    const scrollContainer = document.getElementById('scroll-container');
+    if (scrollContainer) {
+      scrollContainer.scrollTop = scrollPosition;
+    }
+  }, [scrollPosition]);
 
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString('en-US', {
@@ -144,14 +204,15 @@ export default function Dashboard() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-[1900px] mx-auto px-10 py-8">
+      <div className="max-w-[1900px] mx-auto px-10 py-8 overflow-hidden" style={{ height: 'calc(100vh - 180px)' }}>
         {isLoading ? (
-          <div className="flex flex-col items-center justify-center" style={{ height: 'calc(100vh - 180px)' }}>
+          <div className="flex flex-col items-center justify-center h-full">
             <div className="w-20 h-20 border-8 border-slate-700 border-t-emerald-500 rounded-full animate-spin mb-8"></div>
             <p className="text-3xl text-slate-400 font-bold">Loading requests...</p>
           </div>
         ) : requests && requests.length > 0 ? (
-          <div className="space-y-6">
+          <div id="scroll-container" className="h-full overflow-hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            <div className="space-y-8">
             {requests.map((request, index) => {
               const priority = getPriorityConfig(request.priority);
               const timeAgo = getTimeAgo(request.created_at);
@@ -159,7 +220,10 @@ export default function Dashboard() {
               return (
                 <div
                   key={request.id}
-                  className={`${priority.bg} rounded-2xl shadow-xl ${priority.pulse ? 'animate-pulse' : ''}`}
+                  className={`${priority.bg} rounded-2xl shadow-2xl hover:shadow-3xl transition-shadow ${priority.pulse ? 'animate-pulse' : ''}`}
+                  style={{
+                    boxShadow: '0 20px 40px rgba(0, 0, 0, 0.4), 0 10px 20px rgba(0, 0, 0, 0.3), inset 0 -2px 4px rgba(0, 0, 0, 0.2)'
+                  }}
                 >
                   <div className="p-12">
                     <div className="grid grid-cols-12 gap-12">
@@ -243,9 +307,10 @@ export default function Dashboard() {
                 </div>
               );
             })}
+            </div>
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center bg-emerald-600 rounded-2xl shadow-xl" style={{ height: 'calc(100vh - 180px)' }}>
+          <div className="flex flex-col items-center justify-center bg-emerald-600 rounded-2xl shadow-xl h-full">
             <div className="text-8xl font-black text-white mb-6">✓</div>
             <h2 className="text-6xl font-black text-white mb-4">ALL CLEAR</h2>
             <p className="text-3xl font-bold text-emerald-100">No pending delivery requests</p>
