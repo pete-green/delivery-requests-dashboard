@@ -110,7 +110,7 @@ export default function Dashboard() {
     previousRequestIds.current = currentIds;
   }, [requests]);
 
-  // Check for age warnings every minute
+  // Check for age warnings every 15 minutes
   useEffect(() => {
     if (!requests || requests.length === 0) return;
 
@@ -121,20 +121,17 @@ export default function Dashboard() {
         const created = new Date(request.created_at);
         const ageMinutes = Math.floor((now.getTime() - created.getTime()) / 60000);
 
-        // Check if request is 30+ minutes old
-        if (ageMinutes >= 30) {
-          const lastAlert = ageAlertTracker.current.get(request.id) || 0;
-          const timeSinceLastAlert = ageMinutes - lastAlert;
+        // Calculate which 15-minute milestone this request has reached
+        const currentMilestone = Math.floor(ageMinutes / 15);
 
-          // Play alert at 30 minutes, then every 3 minutes after
-          if (lastAlert === 0 && ageMinutes >= 30) {
-            // First alert at 30 minutes
+        // Check if we've reached a 15-minute milestone (15, 30, 45, 60, etc.)
+        if (currentMilestone > 0) {
+          const lastMilestone = ageAlertTracker.current.get(request.id) || 0;
+
+          // Play alert if we've reached a new milestone
+          if (currentMilestone > lastMilestone) {
             playAgeWarningAlert();
-            ageAlertTracker.current.set(request.id, ageMinutes);
-          } else if (timeSinceLastAlert >= 3) {
-            // Subsequent alerts every 3 minutes
-            playAgeWarningAlert();
-            ageAlertTracker.current.set(request.id, ageMinutes);
+            ageAlertTracker.current.set(request.id, currentMilestone);
           }
         }
       });
