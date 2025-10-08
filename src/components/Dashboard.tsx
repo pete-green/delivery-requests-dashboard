@@ -184,14 +184,14 @@ export default function Dashboard() {
 
               <div className="w-px h-16 bg-slate-600"></div>
 
-              <div className="bg-emerald-600 rounded-xl px-8 py-4 shadow-lg">
-                <div className="text-sm text-emerald-100 font-bold uppercase tracking-wide mb-1">Pending</div>
-                <div className="text-5xl font-black text-white tabular-nums">
+              <div className="bg-emerald-600 rounded-xl shadow-lg" style={{ padding: '20px 32px' }}>
+                <div className="text-sm text-emerald-100 font-bold uppercase tracking-wide" style={{ marginBottom: '8px', lineHeight: '1.4' }}>Pending</div>
+                <div className="text-5xl font-black text-white tabular-nums leading-none">
                   {isLoading ? '—' : requests?.length || 0}
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 bg-slate-800 rounded-full px-5 py-3 border-2 border-emerald-500">
+              <div className="flex items-center bg-slate-800 rounded-full border-2 border-emerald-500" style={{ padding: '12px 20px', gap: '12px' }}>
                 <div className="relative">
                   <div className="w-3 h-3 bg-emerald-500 rounded-full"></div>
                   <div className="absolute inset-0 w-3 h-3 bg-emerald-500 rounded-full animate-ping"></div>
