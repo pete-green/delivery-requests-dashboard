@@ -204,15 +204,15 @@ export default function Dashboard() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-[1900px] mx-auto overflow-hidden px-10" style={{ height: 'calc(100vh - 160px)' }}>
+      <div className="max-w-[1900px] mx-auto overflow-hidden" style={{ height: 'calc(100vh - 160px)' }}>
         {isLoading ? (
           <div className="flex flex-col items-center justify-center h-full">
             <div className="w-20 h-20 border-8 border-slate-700 border-t-emerald-500 rounded-full animate-spin mb-8"></div>
             <p className="text-3xl text-slate-400 font-bold">Loading requests...</p>
           </div>
         ) : requests && requests.length > 0 ? (
-          <div id="scroll-container" className="h-full overflow-y-auto py-10" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-            <div className="pb-10">
+          <div id="scroll-container" className="h-full overflow-y-auto px-10 py-8" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            <div className="pb-8">
             {requests.map((request, index) => {
               const priority = getPriorityConfig(request.priority);
               const timeAgo = getTimeAgo(request.created_at);
@@ -223,7 +223,7 @@ export default function Dashboard() {
                   className={`${priority.bg} rounded-2xl shadow-2xl hover:shadow-3xl transition-shadow ${priority.pulse ? 'animate-pulse' : ''}`}
                   style={{
                     boxShadow: '0 20px 40px rgba(0, 0, 0, 0.4), 0 10px 20px rgba(0, 0, 0, 0.3), inset 0 -2px 4px rgba(0, 0, 0, 0.2)',
-                    marginTop: index > 0 ? '2.5rem' : '0'
+                    marginTop: index > 0 ? '1.5rem' : '0'
                   }}
                 >
                   <div className="p-12">
