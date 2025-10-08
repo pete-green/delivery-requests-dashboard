@@ -36,13 +36,3 @@ body {
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
 }
-
-/* Prevent text clipping in rounded containers */
-.rounded-2xl, .rounded-xl {
-  overflow: visible !important;
-}
-
-/* Fix for text being cut off at top of containers */
-.text-xs {
-  line-height: 2 !important;
-}

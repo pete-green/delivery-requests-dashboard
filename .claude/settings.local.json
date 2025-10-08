@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run dev:*)",
+      "Bash(npm run build:*)",
+      "Bash(npx netlify-cli deploy:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nfeat: Complete premium dashboard redesign with modern UI\n\nRedesigned from the ground up with a clean, professional, polished aesthetic:\n\n- Modern light theme with subtle gradients (slate-50 to slate-100)\n- Clean white cards with proper shadows and hover effects\n- Sticky header with logo, stats, and live indicator\n- SVG icons replacing emojis for professional look\n- Color-coded priority borders (red/orange/blue)\n- Improved typography hierarchy and spacing\n- Better information density and organization\n- Responsive grid layout with proper card structure\n- Subtle animations and transitions\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git push:*)",
+      "WebFetch(domain:delivery-requests-dashboard.netlify.app)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nfeat: Bold operations dashboard with high-contrast design\n\nComplete redesign focused on wall display readability and professional operations aesthetic:\n\n- Dark slate theme with bold color-coded cards (red/orange/blue)\n- Large, clear typography for all critical information\n- Technician names in 4xl font-black for maximum visibility\n- Drive times, stats, and metadata in 3xl font-black\n- Full-width gradient cards with proper visual hierarchy\n- ASAP requests pulse for urgency\n- Command center header with emerald accents\n- Removed oversized SVG icons that dominated the screen\n- Information-first layout optimized for distance viewing\n- Professional, energetic, high-impact aesthetic\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git commit:*)",
+      "Bash(curl -s https://delivery-requests-dashboard.netlify.app/)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
