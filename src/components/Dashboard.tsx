@@ -204,15 +204,15 @@ export default function Dashboard() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-[1900px] mx-auto overflow-hidden" style={{ height: 'calc(100vh - 160px)' }}>
+      <div className="max-w-[1900px] mx-auto overflow-hidden px-10" style={{ height: 'calc(100vh - 160px)' }}>
         {isLoading ? (
           <div className="flex flex-col items-center justify-center h-full">
             <div className="w-20 h-20 border-8 border-slate-700 border-t-emerald-500 rounded-full animate-spin mb-8"></div>
             <p className="text-3xl text-slate-400 font-bold">Loading requests...</p>
           </div>
         ) : requests && requests.length > 0 ? (
-          <div id="scroll-container" className="h-full overflow-y-auto px-10 py-10" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-            <div className="space-y-10">
+          <div id="scroll-container" className="h-full overflow-y-auto py-10" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            <div className="space-y-10 pb-10">
             {requests.map((request, index) => {
               const priority = getPriorityConfig(request.priority);
               const timeAgo = getTimeAgo(request.created_at);
