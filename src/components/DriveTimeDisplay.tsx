@@ -46,18 +46,18 @@ export default function DriveTimeDisplay({ latitude, longitude }: DriveTimeDispl
   if (isLoading) {
     return (
       <div>
-        <div className="text-xl font-semibold text-slate-400 tabular-nums">Calculating...</div>
+        <div className="text-2xl font-bold text-white/60 tabular-nums">Calculating...</div>
       </div>
     );
   }
 
   return (
     <div>
-      <div className="text-xl font-semibold text-slate-900 tabular-nums mb-1">
+      <div className="text-3xl font-black text-white tabular-nums mb-1">
         {driveTime}
       </div>
       {distance && (
-        <div className="text-sm font-medium text-slate-500">
+        <div className="text-lg font-semibold text-white/80">
           {distance}
         </div>
       )}
