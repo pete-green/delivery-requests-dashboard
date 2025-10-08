@@ -220,9 +220,10 @@ export default function Dashboard() {
               return (
                 <div
                   key={request.id}
-                  className={`${priority.bg} rounded-2xl shadow-2xl hover:shadow-3xl transition-shadow ${priority.pulse ? 'animate-pulse' : ''} ${index > 0 ? 'mt-10' : ''}`}
+                  className={`${priority.bg} rounded-2xl shadow-2xl hover:shadow-3xl transition-shadow ${priority.pulse ? 'animate-pulse' : ''}`}
                   style={{
-                    boxShadow: '0 20px 40px rgba(0, 0, 0, 0.4), 0 10px 20px rgba(0, 0, 0, 0.3), inset 0 -2px 4px rgba(0, 0, 0, 0.2)'
+                    boxShadow: '0 20px 40px rgba(0, 0, 0, 0.4), 0 10px 20px rgba(0, 0, 0, 0.3), inset 0 -2px 4px rgba(0, 0, 0, 0.2)',
+                    marginTop: index > 0 ? '2.5rem' : '0'
                   }}
                 >
                   <div className="p-12">
