@@ -155,9 +155,9 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-900">
+    <div className="h-screen bg-slate-900 flex flex-col">
       {/* Command Center Header */}
-      <div className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 border-b-4 border-emerald-500 shadow-xl">
+      <div className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 border-b-4 border-emerald-500 shadow-xl flex-shrink-0">
         <div className="max-w-[1900px] mx-auto px-10 py-6">
           <div className="flex items-center justify-between">
             {/* Left: Logo & Title */}
@@ -204,7 +204,7 @@ export default function Dashboard() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-[1900px] mx-auto overflow-hidden" style={{ height: 'calc(100vh - 160px)' }}>
+      <div className="max-w-[1900px] mx-auto overflow-hidden flex-1">
         {isLoading ? (
           <div className="flex flex-col items-center justify-center h-full">
             <div className="w-20 h-20 border-8 border-slate-700 border-t-emerald-500 rounded-full animate-spin mb-8"></div>
