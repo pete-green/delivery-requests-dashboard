@@ -1,11 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useDeliveryRequests } from '../hooks/useDeliveryRequests';
 import DriveTimeDisplay from './DriveTimeDisplay';
+import { initializeAudio, playNewRequestAlert, playAgeWarningAlert, isAudioEnabled } from '../utils/audioAlerts';
 
 export default function Dashboard() {
   const { data: requests, isLoading, error, refetch } = useDeliveryRequests();
   const [currentTime, setCurrentTime] = useState(new Date());
   const [scrollPosition, setScrollPosition] = useState(0);
+  const previousRequestIds = useRef<Set<string>>(new Set());
+  const ageAlertTracker = useRef<Map<string, number>>(new Map()); // Track last alert time for each request
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -73,6 +76,84 @@ export default function Dashboard() {
       scrollContainer.scrollTop = scrollPosition;
     }
   }, [scrollPosition]);
+
+  // Enable audio on first user interaction
+  useEffect(() => {
+    const enableAudio = () => {
+      if (!isAudioEnabled()) {
+        initializeAudio();
+      }
+    };
+
+    document.addEventListener('click', enableAudio, { once: true });
+    document.addEventListener('keydown', enableAudio, { once: true });
+
+    return () => {
+      document.removeEventListener('click', enableAudio);
+      document.removeEventListener('keydown', enableAudio);
+    };
+  }, []);
+
+  // Detect new requests and play alert
+  useEffect(() => {
+    if (!requests || requests.length === 0) return;
+
+    const currentIds = new Set(requests.map(r => r.id));
+
+    // Check for new requests
+    currentIds.forEach(id => {
+      if (!previousRequestIds.current.has(id)) {
+        playNewRequestAlert();
+      }
+    });
+
+    previousRequestIds.current = currentIds;
+  }, [requests]);
+
+  // Check for age warnings every minute
+  useEffect(() => {
+    if (!requests || requests.length === 0) return;
+
+    const checkAgeWarnings = () => {
+      const now = new Date();
+
+      requests.forEach(request => {
+        const created = new Date(request.created_at);
+        const ageMinutes = Math.floor((now.getTime() - created.getTime()) / 60000);
+
+        // Check if request is 30+ minutes old
+        if (ageMinutes >= 30) {
+          const lastAlert = ageAlertTracker.current.get(request.id) || 0;
+          const timeSinceLastAlert = ageMinutes - lastAlert;
+
+          // Play alert at 30 minutes, then every 3 minutes after
+          if (lastAlert === 0 && ageMinutes >= 30) {
+            // First alert at 30 minutes
+            playAgeWarningAlert();
+            ageAlertTracker.current.set(request.id, ageMinutes);
+          } else if (timeSinceLastAlert >= 3) {
+            // Subsequent alerts every 3 minutes
+            playAgeWarningAlert();
+            ageAlertTracker.current.set(request.id, ageMinutes);
+          }
+        }
+      });
+
+      // Clean up tracker for requests that no longer exist
+      const currentIds = new Set(requests.map(r => r.id));
+      Array.from(ageAlertTracker.current.keys()).forEach(id => {
+        if (!currentIds.has(id)) {
+          ageAlertTracker.current.delete(id);
+        }
+      });
+    };
+
+    // Check immediately, then every 10 seconds
+    checkAgeWarnings();
+    const interval = setInterval(checkAgeWarnings, 10000);
+
+    return () => clearInterval(interval);
+  }, [requests]);
 
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString('en-US', {
