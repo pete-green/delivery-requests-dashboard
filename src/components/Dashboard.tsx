@@ -215,6 +215,44 @@ export default function Dashboard() {
     }
   };
 
+  // Get workflow status config based on request state
+  const getStatusConfig = (request: typeof requests extends (infer T)[] | undefined ? T : never) => {
+    // Truck assigned, awaiting dispatch
+    if (request.pull_completed_at && request.delivery_truck_id) {
+      return {
+        label: 'TRUCK ASSIGNED',
+        bg: 'bg-cyan-600',
+        icon: '🚛',
+        pulse: false,
+      };
+    }
+    // Pulled, awaiting truck
+    if (request.pull_completed_at && !request.delivery_truck_id) {
+      return {
+        label: 'PULLED',
+        bg: 'bg-blue-600',
+        icon: '📦',
+        pulse: false,
+      };
+    }
+    // Being pulled (active)
+    if (request.pull_started_at && !request.pull_completed_at) {
+      return {
+        label: 'BEING PULLED',
+        bg: 'bg-purple-600',
+        icon: '🏃',
+        pulse: true,
+      };
+    }
+    // Default: pending
+    return {
+      label: 'PENDING',
+      bg: 'bg-yellow-600',
+      icon: '⏳',
+      pulse: false,
+    };
+  };
+
   if (error) {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center p-8">
@@ -293,6 +331,7 @@ export default function Dashboard() {
             <div className="pb-8">
             {requests.map((request, index) => {
               const priority = getPriorityConfig(request.priority);
+              const status = getStatusConfig(request);
               const timeAgo = getTimeAgo(request.created_at);
 
               return (
@@ -315,9 +354,13 @@ export default function Dashboard() {
 
                       {/* Main Info */}
                       <div className="col-span-5 flex flex-col gap-6">
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-4 flex-wrap">
                           <div className={`inline-block ${priority.badgeBg} px-10 py-5 rounded-xl shadow-2xl border-2 border-white/20`}>
                             <span className="text-lg font-black text-white uppercase tracking-widest">{priority.label}</span>
+                          </div>
+                          <div className={`inline-flex items-center gap-2 ${status.bg} px-6 py-4 rounded-xl shadow-2xl border-2 border-white/20 ${status.pulse ? 'animate-pulse' : ''}`}>
+                            <span className="text-2xl">{status.icon}</span>
+                            <span className="text-base font-black text-white uppercase tracking-wide">{status.label}</span>
                           </div>
                           <div className="bg-black/25 backdrop-blur-sm rounded-2xl shadow-xl border border-white/10 flex-1" style={{ padding: '18px 24px' }}>
                             <div className="text-xs font-bold text-white/60 uppercase tracking-widest" style={{ lineHeight: '1.4', marginBottom: '6px' }}>Request ID</div>

@@ -20,6 +20,17 @@ export interface MaterialRequest {
   updated_at: string;
   total_items: number;
   total_quantity: number;
+  // Pull tracking
+  pull_started_at: string | null;
+  pull_completed_at: string | null;
+  pulled_by: string | null;
+  has_shortages: boolean;
+  // Delivery tracking
+  delivery_truck_id: string | null;
+  dispatched_at: string | null;
+  dispatched_by: string | null;
+  delivered_at: string | null;
+  delivered_by: string | null;
   items?: MaterialRequestItem[];
 }
 
@@ -33,7 +44,8 @@ export interface MaterialRequestItem {
   confirmed: boolean;
 }
 
-// Fetch pending delivery requests for today
+// Fetch delivery requests that haven't been dispatched yet
+// This shows orders from pending through assigned (until driver leaves)
 export function useDeliveryRequests() {
   return useQuery({
     queryKey: ['delivery-requests'],
@@ -48,8 +60,11 @@ export function useDeliveryRequests() {
           *,
           items:material_request_items(*)
         `)
-        .eq('status', 'pending')
         .eq('delivery_method', 'delivery')
+        .is('dispatched_at', null) // Show until dispatched (driver leaves)
+        .neq('status', 'fulfilled') // Exclude already fulfilled
+        .neq('status', 'cancelled') // Exclude cancelled
+        .neq('status', 'rejected') // Exclude rejected
         .gte('needed_date', todayISO)
         .order('created_at', { ascending: true }); // Oldest first
 
