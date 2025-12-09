@@ -362,8 +362,8 @@ export default function Dashboard() {
                     marginTop: index > 0 ? '1.5rem' : '0'
                   }}
                 >
-                  <div className="p-6">
-                    <div className="flex gap-5">
+                  <div className="p-8">
+                    <div className="flex gap-6">
                       {/* Position Badge */}
                       <div className="shrink-0 pt-1">
                         <div className="w-24 h-24 bg-gradient-to-br from-black/40 to-black/60 rounded-2xl flex items-center justify-center shadow-2xl border-2 border-white/20 backdrop-blur-sm">
