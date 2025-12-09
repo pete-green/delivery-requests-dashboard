@@ -10,6 +10,13 @@ export default function Dashboard() {
   const previousRequestIds = useRef<Set<string>>(new Set());
   const ageAlertTracker = useRef<Map<string, number>>(new Map()); // Track last alert time for each request
 
+  // Auto-scroll state - using refs to avoid closure scope issues
+  const scrollStateRef = useRef({
+    isScrollingDown: true,
+    isPaused: false,
+  });
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());
@@ -20,30 +27,37 @@ export default function Dashboard() {
 
   // Auto-scroll effect
   useEffect(() => {
-    if (!requests || requests.length <= 3) return;
+    if (!requests || requests.length <= 3) {
+      // Reset scroll state when not enough items
+      scrollStateRef.current = { isScrollingDown: true, isPaused: false };
+      return;
+    }
 
     const scrollContainer = document.getElementById('scroll-container');
     if (!scrollContainer) return;
 
-    const maxScroll = scrollContainer.scrollHeight - scrollContainer.clientHeight;
     const scrollSpeed = 0.5; // pixels per frame
     const pauseAtTop = 3000; // ms to pause at top
     const pauseAtBottom = 2000; // ms to pause at bottom
 
-    let isScrollingDown = true;
-    let isPaused = false;
+    // Reset scroll state when requests change
+    scrollStateRef.current = { isScrollingDown: true, isPaused: false };
+    setScrollPosition(0);
 
     const scroll = () => {
-      if (isPaused) return;
+      // Recalculate maxScroll each time in case content changed
+      const maxScroll = scrollContainer.scrollHeight - scrollContainer.clientHeight;
 
-      if (isScrollingDown) {
+      if (scrollStateRef.current.isPaused) return;
+
+      if (scrollStateRef.current.isScrollingDown) {
         setScrollPosition((prev) => {
           const next = prev + scrollSpeed;
           if (next >= maxScroll) {
-            isPaused = true;
-            setTimeout(() => {
-              isPaused = false;
-              isScrollingDown = false;
+            scrollStateRef.current.isPaused = true;
+            timeoutRef.current = setTimeout(() => {
+              scrollStateRef.current.isPaused = false;
+              scrollStateRef.current.isScrollingDown = false;
             }, pauseAtBottom);
             return maxScroll;
           }
@@ -53,10 +67,10 @@ export default function Dashboard() {
         setScrollPosition((prev) => {
           const next = prev - scrollSpeed;
           if (next <= 0) {
-            isPaused = true;
-            setTimeout(() => {
-              isPaused = false;
-              isScrollingDown = true;
+            scrollStateRef.current.isPaused = true;
+            timeoutRef.current = setTimeout(() => {
+              scrollStateRef.current.isPaused = false;
+              scrollStateRef.current.isScrollingDown = true;
             }, pauseAtTop);
             return 0;
           }
@@ -67,7 +81,12 @@ export default function Dashboard() {
 
     const interval = setInterval(scroll, 16); // ~60fps
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
   }, [requests]);
 
   useEffect(() => {
@@ -343,61 +362,63 @@ export default function Dashboard() {
                     marginTop: index > 0 ? '1.5rem' : '0'
                   }}
                 >
-                  <div className="p-12">
-                    <div className="grid grid-cols-12 gap-12">
+                  <div className="p-6">
+                    <div className="flex gap-5">
                       {/* Position Badge */}
-                      <div className="col-span-1 flex items-start justify-center pt-1">
-                        <div className="w-32 h-32 bg-gradient-to-br from-black/40 to-black/60 rounded-2xl flex items-center justify-center shadow-2xl border-2 border-white/20 backdrop-blur-sm">
-                          <span className="text-7xl font-black text-white drop-shadow-xl">{index + 1}</span>
+                      <div className="shrink-0 pt-1">
+                        <div className="w-24 h-24 bg-gradient-to-br from-black/40 to-black/60 rounded-2xl flex items-center justify-center shadow-2xl border-2 border-white/20 backdrop-blur-sm">
+                          <span className="text-5xl font-black text-white drop-shadow-xl">{index + 1}</span>
                         </div>
                       </div>
 
                       {/* Main Info */}
-                      <div className="col-span-5 flex flex-col gap-6">
-                        <div className="flex items-center gap-4 flex-wrap">
-                          <div className={`inline-block ${priority.badgeBg} px-10 py-5 rounded-xl shadow-2xl border-2 border-white/20`}>
-                            <span className="text-lg font-black text-white uppercase tracking-widest">{priority.label}</span>
+                      <div className="flex-1 min-w-0 flex flex-col gap-4">
+                        {/* Badges Row */}
+                        <div className="flex items-center gap-3 flex-wrap">
+                          <div className={`${priority.badgeBg} px-6 py-3 rounded-xl shadow-xl border-2 border-white/20`}>
+                            <span className="text-sm font-black text-white uppercase tracking-widest">{priority.label}</span>
                           </div>
-                          <div className={`inline-flex items-center gap-2 ${status.bg} px-6 py-4 rounded-xl shadow-2xl border-2 border-white/20 ${status.pulse ? 'animate-pulse' : ''}`}>
-                            <span className="text-2xl">{status.icon}</span>
-                            <span className="text-base font-black text-white uppercase tracking-wide">{status.label}</span>
+                          <div className={`flex items-center gap-2 ${status.bg} px-4 py-3 rounded-xl shadow-xl border-2 border-white/20 ${status.pulse ? 'animate-pulse' : ''}`}>
+                            <span className="text-xl">{status.icon}</span>
+                            <span className="text-sm font-black text-white uppercase tracking-wide">{status.label}</span>
                           </div>
-                          <div className="bg-black/25 backdrop-blur-sm rounded-2xl shadow-xl border border-white/10 flex-1" style={{ padding: '18px 24px' }}>
-                            <div className="text-xs font-bold text-white/60 uppercase tracking-widest" style={{ lineHeight: '1.4', marginBottom: '6px' }}>Request ID</div>
-                            <div className="font-mono text-xs text-white/75 break-all leading-relaxed">{request.request_id}</div>
+                          <div className="bg-black/25 backdrop-blur-sm rounded-xl shadow-lg border border-white/10 px-4 py-3">
+                            <span className="text-xs font-bold text-white/60 uppercase tracking-wide mr-2">ID:</span>
+                            <span className="font-mono text-xs text-white/80">{request.request_id}</span>
                           </div>
                         </div>
 
-                        <div className="bg-black/25 backdrop-blur-sm rounded-2xl shadow-xl border border-white/10" style={{ padding: '20px 24px 18px 24px' }}>
-                          <div className="text-xs font-bold text-white/60 uppercase tracking-widest" style={{ lineHeight: '1.4', marginBottom: '10px' }}>Technician</div>
-                          <div className="text-5xl font-black text-white leading-tight tracking-tight drop-shadow-lg">{request.tech_name}</div>
+                        {/* Tech & Job */}
+                        <div className="bg-black/25 backdrop-blur-sm rounded-xl shadow-lg border border-white/10 p-5">
+                          <div className="text-xs font-bold text-white/60 uppercase tracking-widest mb-2">Technician</div>
+                          <div className="text-4xl font-black text-white leading-tight tracking-tight drop-shadow-lg truncate">{request.tech_name}</div>
                         </div>
 
-                        <div className="bg-black/25 backdrop-blur-sm rounded-2xl shadow-xl border border-white/10" style={{ padding: '20px 24px 18px 24px' }}>
-                          <div className="text-xs font-bold text-white/60 uppercase tracking-widest" style={{ lineHeight: '1.4', marginBottom: '10px' }}>Job Site</div>
-                          <div className="text-3xl font-bold text-white/95 leading-tight">{request.job_name}</div>
+                        <div className="bg-black/25 backdrop-blur-sm rounded-xl shadow-lg border border-white/10 p-5">
+                          <div className="text-xs font-bold text-white/60 uppercase tracking-widest mb-2">Job Site</div>
+                          <div className="text-2xl font-bold text-white/95 leading-tight truncate">{request.job_name}</div>
                         </div>
 
                         {request.notes && (
-                          <div className="bg-black/30 backdrop-blur-sm rounded-2xl shadow-xl border border-white/10" style={{ padding: '20px 24px 18px 24px' }}>
-                            <div className="text-xs font-bold text-white/60 uppercase tracking-widest" style={{ lineHeight: '1.4', marginBottom: '10px' }}>Notes</div>
-                            <div className="text-lg font-medium text-white/95 leading-relaxed">{request.notes}</div>
+                          <div className="bg-black/30 backdrop-blur-sm rounded-xl shadow-lg border border-white/10 p-5">
+                            <div className="text-xs font-bold text-white/60 uppercase tracking-widest mb-2">Notes</div>
+                            <div className="text-base font-medium text-white/95 leading-relaxed">{request.notes}</div>
                           </div>
                         )}
                       </div>
 
                       {/* Address & Drive Time */}
-                      <div className="col-span-4 flex flex-col gap-6">
+                      <div className="w-72 shrink-0 flex flex-col gap-4">
                         {request.delivery_address && (
-                          <div className="bg-black/25 backdrop-blur-sm rounded-2xl shadow-xl border border-white/10" style={{ padding: '20px 24px 18px 24px' }}>
-                            <div className="text-xs font-bold text-white/60 uppercase tracking-widest" style={{ lineHeight: '1.4', marginBottom: '10px' }}>Delivery Address</div>
-                            <div className="text-lg font-semibold text-white leading-relaxed">{request.delivery_address}</div>
+                          <div className="bg-black/25 backdrop-blur-sm rounded-xl shadow-lg border border-white/10 p-5">
+                            <div className="text-xs font-bold text-white/60 uppercase tracking-widest mb-2">Delivery Address</div>
+                            <div className="text-base font-semibold text-white leading-relaxed">{request.delivery_address}</div>
                           </div>
                         )}
 
                         {request.delivery_latitude && request.delivery_longitude && (
-                          <div className="bg-gradient-to-br from-emerald-600/30 to-emerald-700/30 backdrop-blur-sm rounded-2xl shadow-xl border-2 border-emerald-500/30" style={{ padding: '20px 24px 18px 24px' }}>
-                            <div className="text-xs font-bold text-emerald-200 uppercase tracking-widest" style={{ lineHeight: '1.4', marginBottom: '10px' }}>Drive Time</div>
+                          <div className="bg-gradient-to-br from-emerald-600/30 to-emerald-700/30 backdrop-blur-sm rounded-xl shadow-lg border-2 border-emerald-500/30 p-5">
+                            <div className="text-xs font-bold text-emerald-200 uppercase tracking-widest mb-2">Drive Time</div>
                             <DriveTimeDisplay
                               latitude={request.delivery_latitude}
                               longitude={request.delivery_longitude}
@@ -407,22 +428,22 @@ export default function Dashboard() {
                       </div>
 
                       {/* Metadata */}
-                      <div className="col-span-2 flex flex-col gap-5">
-                        <div className="bg-black/30 backdrop-blur-sm rounded-2xl text-center shadow-xl border border-white/10" style={{ padding: '20px' }}>
-                          <div className="text-xs font-bold text-white/60 uppercase tracking-widest" style={{ lineHeight: '1.4', marginBottom: '10px' }}>Age</div>
-                          <div className="text-4xl font-black text-white tabular-nums leading-none drop-shadow-md">{timeAgo}</div>
+                      <div className="w-32 shrink-0 flex flex-col gap-4">
+                        <div className="bg-black/30 backdrop-blur-sm rounded-xl text-center shadow-lg border border-white/10 p-4">
+                          <div className="text-xs font-bold text-white/60 uppercase tracking-widest mb-2">Age</div>
+                          <div className="text-3xl font-black text-white tabular-nums leading-none drop-shadow-md">{timeAgo}</div>
                         </div>
 
                         {request.truck_number && (
-                          <div className="bg-black/30 backdrop-blur-sm rounded-2xl text-center shadow-xl border border-white/10" style={{ padding: '20px' }}>
-                            <div className="text-xs font-bold text-white/60 uppercase tracking-widest" style={{ lineHeight: '1.4', marginBottom: '10px' }}>Truck</div>
-                            <div className="text-3xl font-black text-white leading-none drop-shadow-md">{request.truck_number}</div>
+                          <div className="bg-black/30 backdrop-blur-sm rounded-xl text-center shadow-lg border border-white/10 p-4">
+                            <div className="text-xs font-bold text-white/60 uppercase tracking-widest mb-2">Truck</div>
+                            <div className="text-2xl font-black text-white leading-none drop-shadow-md">{request.truck_number}</div>
                           </div>
                         )}
 
-                        <div className="bg-black/30 backdrop-blur-sm rounded-2xl text-center shadow-xl border border-white/10" style={{ padding: '20px' }}>
-                          <div className="text-xs font-bold text-white/60 uppercase tracking-widest" style={{ lineHeight: '1.4', marginBottom: '10px' }}>Items</div>
-                          <div className="text-3xl font-black text-white leading-none drop-shadow-md">{request.items?.length || 0}</div>
+                        <div className="bg-black/30 backdrop-blur-sm rounded-xl text-center shadow-lg border border-white/10 p-4">
+                          <div className="text-xs font-bold text-white/60 uppercase tracking-widest mb-2">Items</div>
+                          <div className="text-2xl font-black text-white leading-none drop-shadow-md">{request.items?.length || 0}</div>
                         </div>
                       </div>
                     </div>
